@@ -1,0 +1,62 @@
+@model News
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Shto Lajm" : "Edito Lajm";
+}
+
+<div class="admin-form-wrap">
+    <h2 class="page-title mb-4">@(isNew ? "Shto Lajm" : "Edito Lajm")</h2>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Summary" class="form-label"></label>
+            <textarea asp-for="Summary" class="form-control" rows="2"></textarea>
+            <span asp-validation-for="Summary" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Content" class="form-label"></label>
+            <textarea asp-for="Content" class="form-control" rows="8"></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="ImageUrl" class="form-label"></label>
+                <input asp-for="ImageUrl" class="form-control" placeholder="https://..." />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="CategoryId" class="form-label">Kategoria</label>
+                <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+                    <option value="">-- Zgjidh --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="PublishedAt" class="form-label"></label>
+                <input asp-for="PublishedAt" type="datetime-local" class="form-control"
+                       value="@Model.PublishedAt.ToString("yyyy-MM-ddTHH:mm")" />
+                <span asp-validation-for="PublishedAt" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-pulse">Ruaj</button>
+            <a class="btn btn-outline-secondary" asp-action="Dashboard">Anulo</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

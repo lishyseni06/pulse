@@ -1,0 +1,55 @@
+@using Pulse.Services
+@model List<News>
+@{
+    ViewData["Title"] = "Paneli";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2 class="page-title mb-0">Paneli i Adminit</h2>
+    <a class="btn btn-pulse" asp-action="Edit">+ Shto Lajm</a>
+</div>
+
+@if (TempData["Msg"] != null)
+{
+    <div class="alert alert-success">@TempData["Msg"]</div>
+}
+
+<div class="table-responsive admin-table-wrap">
+    <table class="table admin-table align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Foto</th>
+                <th>Titulli</th>
+                <th>Kategoria</th>
+                <th>Data</th>
+                <th class="text-end">Veprime</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var n in Model)
+            {
+                <tr>
+                    <td>@n.Id</td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(n.ImageUrl))
+                        {
+                            <img src="@n.ImageUrl" class="admin-thumb" alt="" />
+                        }
+                    </td>
+                    <td class="fw-semibold">@n.Title</td>
+                    <td><span class="cat-badge sm @CategoryBadge.Class(n.Category?.Name)">@n.Category?.Name</span></td>
+                    <td>@n.PublishedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@n.Id">Edito</a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@n.Id">Fshij</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted py-4">Ende nuk ka lajme.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

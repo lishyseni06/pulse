@@ -1,0 +1,31 @@
+@using Pulse.Services
+@model News
+@{
+    ViewData["Title"] = "Fshij Lajm";
+}
+
+<div class="admin-form-wrap">
+    <h2 class="page-title mb-4">Fshij Lajm</h2>
+
+    <div class="alert alert-danger">
+        A jeni i sigurt që dëshironi ta fshini këtë lajm? Ky veprim nuk mund të kthehet.
+    </div>
+
+    <div class="card delete-card mb-4">
+        <div class="card-body">
+            <span class="cat-badge @CategoryBadge.Class(Model.Category?.Name)">@Model.Category?.Name</span>
+            <h4 class="mt-2">@Model.Title</h4>
+            <p class="text-muted mb-1">@Model.PublishedAt.ToString("dd MMMM yyyy, HH:mm")</p>
+            @if (!string.IsNullOrWhiteSpace(Model.Summary))
+            {
+                <p class="mb-0">@Model.Summary</p>
+            }
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Po, fshije</button>
+        <a class="btn btn-outline-secondary" asp-action="Dashboard">Anulo</a>
+    </form>
+</div>

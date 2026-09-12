@@ -1,0 +1,57 @@
+@using Pulse.Services
+@model News
+@{
+    ViewData["Title"] = Model.Title;
+    ViewData["Category"] = Model.Category?.Name;
+    var related = ViewData["Related"] as List<News> ?? new();
+    string Img(News n) => string.IsNullOrWhiteSpace(n.ImageUrl)
+        ? "https://placehold.co/800x500/0b1220/1fe08f?text=PULSE" : n.ImageUrl!;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb pulse-breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ballina</a></li>
+        <li class="breadcrumb-item"><a href="/Lajme/@Model.Category?.Name">@Model.Category?.Name</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+    </ol>
+</nav>
+
+<article class="article">
+    <span class="cat-badge @CategoryBadge.Class(Model.Category?.Name)">@Model.Category?.Name</span>
+    <h1 class="article-title">@Model.Title</h1>
+    <p class="article-meta">@Model.PublishedAt.ToString("dddd, dd MMMM yyyy, HH:mm", new System.Globalization.CultureInfo("sq-AL"))</p>
+
+    <div class="article-hero" style="background-image:url('@Img(Model)')"></div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Summary))
+    {
+        <p class="article-lead">@Model.Summary</p>
+    }
+
+    <div class="article-content">
+        @foreach (var para in Model.Content.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            <p>@para</p>
+        }
+    </div>
+</article>
+
+@if (related.Any())
+{
+    <h4 class="section-title mt-5 mb-3">Të ngjashme</h4>
+    <div class="row g-4">
+        @foreach (var n in related)
+        {
+            <div class="col-md-4">
+                <a class="news-card" asp-controller="Home" asp-action="Details" asp-route-id="@n.Id">
+                    <div class="news-img" style="background-image:url('@Img(n)')"></div>
+                    <div class="news-body">
+                        <span class="cat-badge @CategoryBadge.Class(n.Category?.Name)">@n.Category?.Name</span>
+                        <h3 class="news-title">@n.Title</h3>
+                        <span class="news-date">@n.PublishedAt.ToString("dd MMMM yyyy")</span>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}

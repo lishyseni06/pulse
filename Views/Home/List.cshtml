@@ -1,0 +1,47 @@
+@using Pulse.Services
+@model List<News>
+@{
+    var cat = ViewData["Category"] as string;
+    ViewData["Title"] = cat;
+    string Img(News n) => string.IsNullOrWhiteSpace(n.ImageUrl)
+        ? "https://placehold.co/800x500/0b1220/1fe08f?text=PULSE" : n.ImageUrl!;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb pulse-breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ballina</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@cat</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center gap-2 mb-4">
+    <span class="cat-badge @CategoryBadge.Class(cat)">@cat</span>
+    <h2 class="page-title mb-0">Lajmet: @cat</h2>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Nuk ka lajme në këtë kategori.</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var n in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <a class="news-card" asp-controller="Home" asp-action="Details" asp-route-id="@n.Id">
+                    <div class="news-img" style="background-image:url('@Img(n)')"></div>
+                    <div class="news-body">
+                        <span class="cat-badge @CategoryBadge.Class(n.Category?.Name)">@n.Category?.Name</span>
+                        <h3 class="news-title">@n.Title</h3>
+                        @if (!string.IsNullOrWhiteSpace(n.Summary))
+                        {
+                            <p class="news-summary">@n.Summary</p>
+                        }
+                        <span class="news-date">@n.PublishedAt.ToString("dd MMMM yyyy")</span>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,42 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=${DB_NAME:-PulseDb};User Id=sa;Password=${DB_SA_PASSWORD};MultipleActiveResultSets=true;Encrypt=True;TrustServerCertificate=True"
+    networks:
+      - internal
+      - dokploy-network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_SA_PASSWORD}
+      MSSQL_PID: Express
+      MSSQL_TCP_PORT: "1433"
+    volumes:
+      - mssql:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/1433' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    networks:
+      - internal
+
+volumes:
+  mssql:
+
+networks:
+  internal:
+  dokploy-network:
+    external: true

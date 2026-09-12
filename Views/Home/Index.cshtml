@@ -1,0 +1,76 @@
+@using Pulse.Services
+@model List<News>
+@{
+    ViewData["Title"] = "Ballina";
+    var hero = Model.FirstOrDefault();
+    var side = Model.Skip(1).Take(3).ToList();
+    var rest = Model.Skip(4).ToList();
+    string Img(News n) => string.IsNullOrWhiteSpace(n.ImageUrl)
+        ? "https://placehold.co/800x500/0b1220/1fe08f?text=PULSE" : n.ImageUrl!;
+}
+
+@if (hero == null)
+{
+    <div class="alert alert-info">Ende nuk ka lajme të publikuara.</div>
+}
+else
+{
+    <div class="row g-4 mb-5">
+        <!-- Hero -->
+        <div class="col-lg-8">
+            <a class="hero-card" asp-controller="Home" asp-action="Details" asp-route-id="@hero.Id">
+                <div class="hero-img" style="background-image:url('@Img(hero)')"></div>
+                <div class="hero-overlay">
+                    <span class="cat-badge @CategoryBadge.Class(hero.Category?.Name)">@hero.Category?.Name</span>
+                    <h1 class="hero-title">@hero.Title</h1>
+                    @if (!string.IsNullOrWhiteSpace(hero.Summary))
+                    {
+                        <p class="hero-summary">@hero.Summary</p>
+                    }
+                    <span class="hero-date">@hero.PublishedAt.ToString("dd MMMM yyyy, HH:mm")</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <h5 class="section-title">Më të lexuarat</h5>
+            <div class="side-list">
+                @foreach (var n in side)
+                {
+                    <a class="side-item" asp-controller="Home" asp-action="Details" asp-route-id="@n.Id">
+                        <div class="side-thumb" style="background-image:url('@Img(n)')"></div>
+                        <div class="side-body">
+                            <span class="cat-badge sm @CategoryBadge.Class(n.Category?.Name)">@n.Category?.Name</span>
+                            <span class="side-title">@n.Title</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (rest.Any())
+    {
+        <h5 class="section-title mb-3">Lajmet e fundit</h5>
+        <div class="row g-4">
+            @foreach (var n in rest)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <a class="news-card" asp-controller="Home" asp-action="Details" asp-route-id="@n.Id">
+                        <div class="news-img" style="background-image:url('@Img(n)')"></div>
+                        <div class="news-body">
+                            <span class="cat-badge @CategoryBadge.Class(n.Category?.Name)">@n.Category?.Name</span>
+                            <h3 class="news-title">@n.Title</h3>
+                            @if (!string.IsNullOrWhiteSpace(n.Summary))
+                            {
+                                <p class="news-summary">@n.Summary</p>
+                            }
+                            <span class="news-date">@n.PublishedAt.ToString("dd MMMM yyyy")</span>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+}

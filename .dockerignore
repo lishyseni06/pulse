@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/.git/
+**/.vs/
+**/.vscode/
+**/*.user
+Database/*.mdf
+Database/*.ldf
+*.jpeg
+*.jpg
+*.png
+!wwwroot/**
