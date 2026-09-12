@@ -15,8 +15,13 @@ namespace Pulse.Controllers;
 public class AdminController : Controller
 {
     private readonly AppDbContext _db;
+    private readonly IWebHostEnvironment _env;
 
-    public AdminController(AppDbContext db) => _db = db;
+    public AdminController(AppDbContext db, IWebHostEnvironment env)
+    {
+        _db = db;
+        _env = env;
+    }
 
     // ---------- Autentikimi ----------
 
@@ -98,12 +103,27 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(News model)
+    public async Task<IActionResult> Edit(News model, IFormFile? imageFile)
     {
+        // ImageUrl mbushet nga file-i i ngarkuar (jo nga përdoruesi) — hiqe nga validimi.
+        ModelState.Remove(nameof(News.ImageUrl));
+
         if (!ModelState.IsValid)
         {
             await PopulateCategoriesAsync(model.CategoryId);
             return View(model);
+        }
+
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var savedPath = await SaveImageAsync(imageFile);
+            if (savedPath == null)
+            {
+                ModelState.AddModelError(string.Empty, "Foto duhet të jetë imazh (jpg, png, gif, webp) deri në 5 MB.");
+                await PopulateCategoriesAsync(model.CategoryId);
+                return View(model);
+            }
+            model.ImageUrl = savedPath;
         }
 
         if (model.Id == 0)
@@ -144,6 +164,27 @@ public class AdminController : Controller
             TempData["Msg"] = "Lajmi u fshi.";
         }
         return RedirectToAction(nameof(Dashboard));
+    }
+
+    private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
+    private async Task<string?> SaveImageAsync(IFormFile file)
+    {
+        const long maxBytes = 5 * 1024 * 1024; // 5 MB
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (file.Length > maxBytes || !AllowedExtensions.Contains(ext))
+            return null;
+
+        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
+        Directory.CreateDirectory(uploadsDir);
+
+        var fileName = $"{Guid.NewGuid():N}{ext}";
+        var fullPath = Path.Combine(uploadsDir, fileName);
+
+        await using var stream = new FileStream(fullPath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        return $"/uploads/{fileName}";
     }
 
     private async Task PopulateCategoriesAsync(int selectedId)

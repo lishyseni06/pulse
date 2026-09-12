@@ -21,7 +21,7 @@ public class News
     public string Content { get; set; } = string.Empty;
 
     [StringLength(300)]
-    [Display(Name = "Foto (URL)")]
+    [Display(Name = "Foto")]
     public string? ImageUrl { get; set; }
 
     [Display(Name = "Data e publikimit")]
