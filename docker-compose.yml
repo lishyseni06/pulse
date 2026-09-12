@@ -10,6 +10,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DefaultConnection: "Server=db,1433;Database=${DB_NAME:-PulseDb};User Id=sa;Password=${DB_SA_PASSWORD};MultipleActiveResultSets=true;Encrypt=True;TrustServerCertificate=True"
+    volumes:
+      - uploads:/app/wwwroot/uploads
     networks:
       - internal
       - dokploy-network
@@ -35,6 +37,7 @@ services:
 
 volumes:
   mssql:
+  uploads:
 
 networks:
   internal:

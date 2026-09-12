@@ -26,6 +26,10 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=build /app/publish .
 
+# Dosja e fotove të ngarkuara — pronësi te përdoruesi jo-root që volume-i
+# i Docker-it të trashëgojë të drejtat e shkrimit kur mbushet herën e parë.
+RUN mkdir -p /app/wwwroot/uploads && chown -R $APP_UID /app/wwwroot/uploads
+
 ENV ASPNETCORE_ENVIRONMENT=Production \
     ASPNETCORE_HTTP_PORTS=8080
 
